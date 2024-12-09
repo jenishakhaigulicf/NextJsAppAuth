@@ -2,7 +2,7 @@
 
 import { createAuthSession } from "@/lib/auth";
 import { hashUserPassword, verifyPassword } from "@/lib/hash";
-import createUser, { getUserByEmail } from "@/lib/user";
+import { getUserByEmail, createUser } from "@/lib/user";
 import { redirect } from "next/navigation";
 
 export const signup = async (_, formData) => {
@@ -33,7 +33,7 @@ export const signup = async (_, formData) => {
     if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
       return {
         errors: {
-          email: "invalid email or password",
+          email: "User with the email already exist",
         },
       };
     }
@@ -65,4 +65,11 @@ export async function login(prevState, formData) {
   }
   await createAuthSession(existingUser.id);
   redirect("/training");
+}
+
+export async function auth(mode, prevState, formData) {
+  if (mode === "login") {
+    return login(prevState, formData);
+  }
+  return signup(prevState, formData);
 }
