@@ -19,6 +19,7 @@ const signup = async (_, formData) => {
   }
 
   // store it in the db
+  createUser(email, password);
 };
 
 export default signup;
