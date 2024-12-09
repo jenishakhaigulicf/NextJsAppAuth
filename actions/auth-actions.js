@@ -1,6 +1,8 @@
 "use server";
 
 import { hashUserPassword } from "@/lib/hash";
+import createUser from "@/lib/user";
+import { redirect } from "next/navigation";
 
 const signup = async (_, formData) => {
   const email = formData.get("email");
@@ -22,7 +24,20 @@ const signup = async (_, formData) => {
 
   // store it in the db
   const hashedPassword = hashUserPassword(password);
-  createUser(email, hashedPassword);
+  try {
+    createUser(email, hashedPassword);
+  } catch (error) {
+    if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
+      return {
+        errors: {
+          email: "invalid email or password",
+        },
+      };
+    }
+    throw error;
+  }
+
+  redirect("/training");
 };
 
 export default signup;
